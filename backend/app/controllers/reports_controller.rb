@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
   def dashboard
     utilization = OfficeResource.left_joins(:resource_bookings)
                                 .group(:id, :name)
-                                .select("office_resources.name, count(resource_bookings.id) as bookings_count")
+                                .select("office_resources.id, office_resources.name, count(resource_bookings.id) as bookings_count")
                                 .order("bookings_count DESC")
 
     patterns = ResourceBooking.group("EXTRACT(HOUR FROM start_time)")
