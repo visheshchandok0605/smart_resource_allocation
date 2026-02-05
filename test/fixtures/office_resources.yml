@@ -1,0 +1,14 @@
+room:
+  name: Conference Room A
+  resource_type: room
+  status: active
+
+laptop:
+  name: MacBook Pro 1
+  resource_type: equipment
+  status: active
+
+maintenance_room:
+  name: Broken Room
+  resource_type: room
+  status: maintenance

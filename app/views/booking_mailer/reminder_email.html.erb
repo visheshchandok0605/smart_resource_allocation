@@ -1,0 +1,32 @@
+<div style="text-align: center; margin-bottom: 30px;">
+  <div style="font-size: 48px; margin-bottom: 20px;">🕒</div>
+  <h2 style="margin: 0; color: #1e293b;">Time to Check-in!</h2>
+  <p style="font-size: 18px; color: #64748b; margin-top: 10px;">
+    Your booking for <strong><%= @resource.name %></strong> is starting now.
+  </p>
+</div>
+
+<div style="background-color: #f8fafc; border-radius: 8px; padding: 25px; margin-bottom: 30px; border: 1px solid #e2e8f0; text-align: center;">
+  <p style="margin-bottom: 20px; font-weight: 500;">Please confirm your attendance or release the resource:</p>
+  
+  <div style="margin-bottom: 5px;">
+    <%= link_to "✅ Confirm Check-in", quick_check_in_resource_booking_url(@booking), 
+        class: "btn btn-success", style: "color: #ffffff; width: 220px;" %>
+  </div>
+
+  <div style="margin-bottom: 5px;">
+    <%= link_to "❌ Cancel Booking", quick_cancel_resource_booking_url(@booking), 
+        class: "btn btn-danger", style: "color: #ffffff; width: 220px;" %>
+  </div>
+
+  <% if @booking.meeting_link.present? %>
+  <div style="margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+    <%= link_to "🎥 Join Meeting Now", @booking.meeting_link, 
+        class: "btn", style: "color: #ffffff; width: 220px;" %>
+  </div>
+  <% end %>
+</div>
+
+<p style="text-align: center; color: #64748b; font-size: 14px;">
+  If you do nothing, your booking will remain active and you will be considered checked-in.
+</p>

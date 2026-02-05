@@ -1,0 +1,11 @@
+Action Required: Your booking for <%= @resource.name %> starts NOW!
+
+Please confirm your attendance or cancel your booking using the links below:
+
+Confirm Check-in: <%= quick_check_in_resource_booking_url(@booking) %>
+Cancel Booking: <%= quick_cancel_resource_booking_url(@booking) %>
+
+If you do nothing, your booking will remain active and you will be considered checked-in.
+
+Best regards,
+Smart Office Team

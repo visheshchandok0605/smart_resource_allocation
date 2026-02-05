@@ -1,0 +1,66 @@
+<%
+  status_color = case @booking.status
+                 when 'approved' then '#10b981'
+                 when 'rejected' then '#ef4444'
+                 else '#3b82f6'
+                 end
+%>
+
+<div style="text-align: center; margin-bottom: 30px;">
+  <div style="font-size: 48px; margin-bottom: 20px;">
+    <% if @booking.approved? %> 🗓️ <% elsif @booking.rejected? %> ❌ <% else %> ⌛ <% end %>
+  </div>
+  <h2 style="margin: 0; color: #1e293b;">Hello, <%= @user.name %>!</h2>
+  <p style="font-size: 18px; color: #64748b; margin-top: 10px;">
+    Your booking for <strong><%= @resource.name %></strong> has been 
+    <span style="color: <%= status_color %>; font-weight: bold; text-transform: uppercase;">
+      <%= @booking.status %>
+    </span>
+  </p>
+</div>
+
+<div style="background-color: #f8fafc; border-radius: 8px; padding: 20px; margin-bottom: 30px; border-left: 4px solid <%= status_color %>;">
+  <h3 style="margin-top: 0; color: #1e293b; font-size: 16px;">Booking Details:</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 8px 0; color: #64748b;">Resource:</td>
+      <td style="padding: 8px 0; font-weight: 600;"><%= @resource.name %></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: #64748b;">Date:</td>
+      <td style="padding: 8px 0; font-weight: 600;"><%= @booking.start_time.strftime("%B %d, %Y") %></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: #64748b;">Time:</td>
+      <td style="padding: 8px 0; font-weight: 600;">
+        <%= @booking.start_time.strftime("%I:%M %p") %> - <%= @booking.end_time.strftime("%I:%M %p") %>
+      </td>
+    </tr>
+    <% if @booking.admin_note.present? %>
+    <tr>
+      <td style="padding: 8px 0; color: #64748b;">Admin Note:</td>
+      <td style="padding: 8px 0; font-style: italic;"><%= @booking.admin_note %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>
+
+<% if @booking.approved? %>
+  <p style="text-align: center;">
+    We look forward to seeing you! Please remember to <strong>check in</strong> via the app once you arrive at the room.
+  </p>
+<% elsif @booking.rejected? %>
+  <p style="text-align: center;">
+    We apologize for the inconvenience. You can check the dashboard for alternative available slots or resources.
+  </p>
+<% end %>
+
+<% if @booking.meeting_link.present? %>
+<div style="text-align: center; margin-top: 30px;">
+  <a href="<%= @booking.meeting_link %>" class="btn" style="color: #ffffff;">🎥 Join Meeting Now</a>
+</div>
+<% end %>
+
+<div style="text-align: center; margin-top: 10px;">
+  <a href="http://localhost:3000/dashboard" class="btn btn-secondary" style="color: #ffffff;">📊 View My Bookings</a>
+</div>
