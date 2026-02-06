@@ -5,13 +5,13 @@ class UsersController < ApplicationController
 
   # GET /users - Lists all users in the system.
   def index
-    render json: @users
+    render json: UserBlueprint.render(@users)
   end
 
   # POST /users - Admins create a new employee (or admin).
   def create
     if @user.save
-      render json: @user, status: :created
+      render json: UserBlueprint.render(@user), status: :created
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -19,7 +19,7 @@ class UsersController < ApplicationController
 
   # GET /users/:id - Shows details of a specific user.
   def show
-    render json: @user
+    render json: UserBlueprint.render(@user)
   rescue ActiveRecord::RecordNotFound
     render json: { error: "User not found" }, status: :not_found
   end

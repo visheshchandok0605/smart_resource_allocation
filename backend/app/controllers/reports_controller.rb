@@ -17,10 +17,10 @@ class ReportsController < ApplicationController
     overutilized = utilization.first(3)
 
     render json: {
-      utilization: utilization,
+      utilization: OfficeResourceBlueprint.render_as_hash(utilization),
       booking_patterns: patterns,
-      underutilized: underutilized,
-      overutilized: overutilized
+      underutilized: OfficeResourceBlueprint.render_as_hash(underutilized),
+      overutilized: OfficeResourceBlueprint.render_as_hash(overutilized)
     }
   end
 end

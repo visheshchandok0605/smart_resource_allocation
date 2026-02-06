@@ -11,12 +11,12 @@ class ResourceBookingsController < ApplicationController
   def index
     # @resource_bookings is automatically scoped by CanCanCan 
     # (Admins see all, Employees see only their own via Ability.rb).
-    render json: @resource_bookings
+    render json: ResourceBookingBlueprint.render(@resource_bookings)
   end
 
   # GET /resource_bookings/:id - Shows details of a specific request.
   def show
-    render json: @resource_booking
+    render json: ResourceBookingBlueprint.render(@resource_booking)
   end
 
   # POST /resource_bookings - An employee submits a new booking request.
@@ -25,7 +25,7 @@ class ResourceBookingsController < ApplicationController
     @resource_booking.status = :pending
 
     if @resource_booking.save
-      render json: @resource_booking, status: :created
+      render json: ResourceBookingBlueprint.render(@resource_booking), status: :created
     else
       # Prepare the error response
       response = { errors: @resource_booking.errors.full_messages }
@@ -37,7 +37,7 @@ class ResourceBookingsController < ApplicationController
           @resource_booking.start_time,
           @resource_booking.end_time
         )
-        response[:suggested_alternatives] = alternatives if alternatives.any?
+        response[:suggested_alternatives] = OfficeResourceBlueprint.render_as_hash(alternatives) if alternatives.any?
       end
       
       render json: response, status: :unprocessable_entity
@@ -57,7 +57,7 @@ class ResourceBookingsController < ApplicationController
       BookingMailer.booking_status_email(@resource_booking).deliver_later
       # Mentor Feedback: Schedule a reminder email at the start time
       SendBookingReminderJob.set(wait_until: @resource_booking.start_time).perform_later(@resource_booking.id)
-      render json: @resource_booking
+      render json: ResourceBookingBlueprint.render(@resource_booking)
     else
       render json: @resource_booking.errors, status: :unprocessable_entity
     end
@@ -72,7 +72,10 @@ class ResourceBookingsController < ApplicationController
         @resource_booking.start_time,
         @resource_booking.end_time
       )
-      render json: { booking: @resource_booking, suggestions: alternatives }
+      render json: { 
+        booking: ResourceBookingBlueprint.render_as_hash(@resource_booking), 
+        suggestions: OfficeResourceBlueprint.render_as_hash(alternatives) 
+      }
     else
       render json: @resource_booking.errors, status: :unprocessable_entity
     end
@@ -86,7 +89,7 @@ class ResourceBookingsController < ApplicationController
 
     if @resource_booking.update(checked_in_at: Time.current)
       AuditLog.log(@resource_booking, "check_in", "User checked in to the resource.")
-      render json: @resource_booking
+      render json: ResourceBookingBlueprint.render(@resource_booking)
     else
       render json: @resource_booking.errors, status: :unprocessable_entity
     end
@@ -129,7 +132,7 @@ class ResourceBookingsController < ApplicationController
     if params[:resource_type]
       resources = resources.where(resource_type: params[:resource_type])
     end
-    render json: resources
+    render json: OfficeResourceBlueprint.render(resources)
   end
 
   private

@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
     # authenticate is a method provided by 'has_secure_password' in the User model.
     if user&.authenticate(params[:password])
       token = JsonWebToken.encode(user_id: user.id)
-      render json: { token: token, user: user }, status: :ok
+      render json: { token: token, user: UserBlueprint.render_as_hash(user) }, status: :ok
     else
       render json: { error: 'Invalid email or password' }, status: :unauthorized
     end

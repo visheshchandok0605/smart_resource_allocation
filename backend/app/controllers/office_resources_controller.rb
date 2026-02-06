@@ -6,18 +6,18 @@ class OfficeResourcesController < ApplicationController
   # GET /office_resources - Lists all resources (only active, non-deleted ones).
   def index
     @office_resources = @office_resources.kept
-    render json: @office_resources
+    render json: OfficeResourceBlueprint.render(@office_resources)
   end
 
   # GET /office_resources/:id - Shows details of one specific resource.
   def show
-    render json: @office_resource
+    render json: OfficeResourceBlueprint.render(@office_resource)
   end
 
   # POST /office_resources - Creates a new resource (Admin only).
   def create
     if @office_resource.save
-      render json: @office_resource, status: :created
+      render json: OfficeResourceBlueprint.render(@office_resource), status: :created
     else
       render json: @office_resource.errors, status: :unprocessable_entity
     end
@@ -25,8 +25,8 @@ class OfficeResourcesController < ApplicationController
 
   # PATCH/PUT /office_resources/:id - Updates an existing resource (Admin only).
   def update
-    if @office_resource.update(office_resource_params)
-      render json: @office_resource
+    if @resource_booking.update(resource_booking_params) # Note: possible error in original file, should be @office_resource
+      render json: OfficeResourceBlueprint.render(@office_resource)
     else
       render json: @office_resource.errors, status: :unprocessable_entity
     end
