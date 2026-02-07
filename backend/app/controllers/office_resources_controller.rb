@@ -25,7 +25,7 @@ class OfficeResourcesController < ApplicationController
 
   # PATCH/PUT /office_resources/:id - Updates an existing resource (Admin only).
   def update
-    if @resource_booking.update(resource_booking_params) # Note: possible error in original file, should be @office_resource
+    if @office_resource.update(office_resource_params)
       render json: OfficeResourceBlueprint.render(@office_resource)
     else
       render json: @office_resource.errors, status: :unprocessable_entity

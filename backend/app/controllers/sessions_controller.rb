@@ -14,4 +14,14 @@ class SessionsController < ApplicationController
       render json: { error: 'Invalid email or password' }, status: :unauthorized
     end
   end
+
+  # DELETE /auth/logout
+  def logout
+    if current_user
+      AuditLog.log(current_user, 'logout', "User logged out.")
+      render json: { message: 'Logged out successfully' }, status: :ok
+    else
+      render json: { error: 'Not logged in' }, status: :unauthorized
+    end
+  end
 end
