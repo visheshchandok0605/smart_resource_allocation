@@ -4,10 +4,11 @@ class BookingMailer < ApplicationMailer
   #
   #   en.booking_mailer.booking_status_email.subject
   #
-  def booking_status_email(booking)
+  def booking_status_email(booking, alternatives = [])
     @booking = booking
     @user = booking.user
     @resource = booking.office_resource
+    @alternatives = alternatives
     @greeting = "Hi #{@user.name}"
 
     mail(

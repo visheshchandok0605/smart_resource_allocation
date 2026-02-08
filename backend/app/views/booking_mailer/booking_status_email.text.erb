@@ -12,6 +12,20 @@ Time: <%= @booking.start_time.strftime("%I:%M %p") %> - <%= @booking.end_time.st
 Admin Note: <%= @booking.admin_note %>
 <% end %>
 
+<% if @booking.rejected? %>
+We apologize for the inconvenience. Here are some alternative <%= @booking.office_resource.resource_type.pluralize %> available for the same time slot:
+
+<% if @alternatives.any? %>
+<% @alternatives.each do |alt| %>
+- <%= alt.name %>: http://localhost:3000/office_resources/<%= alt.id %>
+<% end %>
+<% else %>
+No other resources of this type are available for the requested time.
+<% end %>
+
+You can also check the dashboard for other available slots.
+<% end %>
+
 View your bookings at: http://localhost:3000/dashboard
 
 Best regards,

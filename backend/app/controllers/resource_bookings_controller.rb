@@ -35,7 +35,8 @@ class ResourceBookingsController < ApplicationController
         alternatives = OfficeResource.suggest_alternatives(
           @resource_booking.office_resource.resource_type,
           @resource_booking.start_time,
-          @resource_booking.end_time
+          @resource_booking.end_time,
+          exclude_id: @resource_booking.office_resource_id
         )
         response[:suggested_alternatives] = OfficeResourceBlueprint.render_as_hash(alternatives) if alternatives.any?
       end
@@ -54,7 +55,7 @@ class ResourceBookingsController < ApplicationController
     end
 
     if @resource_booking.update(status: :approved, admin_note: params[:admin_note])
-      BookingMailer.booking_status_email(@resource_booking).deliver_later
+      BookingMailer.booking_status_email(@resource_booking).deliver_now
       # Mentor Feedback: Schedule a reminder email at the start time
       SendBookingReminderJob.set(wait_until: @resource_booking.start_time).perform_later(@resource_booking.id)
       render json: ResourceBookingBlueprint.render(@resource_booking)
@@ -66,12 +67,15 @@ class ResourceBookingsController < ApplicationController
   # PATCH /resource_bookings/:id/reject - (Admin only)
   def reject
     if @resource_booking.update(status: :rejected, admin_note: params[:admin_note])
-      BookingMailer.booking_status_email(@resource_booking).deliver_later
       alternatives = OfficeResource.suggest_alternatives(
         @resource_booking.office_resource.resource_type,
         @resource_booking.start_time,
-        @resource_booking.end_time
+        @resource_booking.end_time,
+        exclude_id: @resource_booking.office_resource_id
       )
+      
+      BookingMailer.booking_status_email(@resource_booking, alternatives.to_a).deliver_now
+
       render json: { 
         booking: ResourceBookingBlueprint.render_as_hash(@resource_booking), 
         suggestions: OfficeResourceBlueprint.render_as_hash(alternatives) 

@@ -5,7 +5,6 @@ class OfficeResourcesController < ApplicationController
 
   # GET /office_resources - Lists all resources (only active, non-deleted ones).
   def index
-    @office_resources = @office_resources.kept
     render json: OfficeResourceBlueprint.render(@office_resources)
   end
 

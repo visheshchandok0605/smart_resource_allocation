@@ -50,8 +50,29 @@
     We look forward to seeing you! Please remember to <strong>check in</strong> via the app once you arrive at the room.
   </p>
 <% elsif @booking.rejected? %>
+  <p style="text-align: center; color: #64748b; margin-bottom: 24px;">
+    We apologize for the inconvenience. Here are some alternative <strong><%= @booking.office_resource.resource_type.pluralize %></strong> available for the same time slot:
+  </p>
+
+  <% if @alternatives.any? %>
+    <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <% @alternatives.each do |alt| %>
+          <li style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: #1e293b;"><%= alt.name %></span>
+            <a href="http://localhost:3000/office_resources/<%= alt.id %>" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500;">Book Now &rarr;</a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <p style="text-align: center; font-style: italic; color: #94a3b8;">
+      No other resources of this type are available for the requested time.
+    </p>
+  <% end %>
+
   <p style="text-align: center;">
-    We apologize for the inconvenience. You can check the dashboard for alternative available slots or resources.
+    You can also check the dashboard for other available slots.
   </p>
 <% end %>
 
