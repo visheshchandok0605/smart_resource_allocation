@@ -112,6 +112,11 @@ class ResourceBookingsController < ApplicationController
   # GET /resource_bookings/:id/quick_check_in
   # Simple action for one-click email confirmation.
   def quick_check_in
+    if Time.current > @resource_booking.start_time + 10.minutes
+      render plain: "This check-in link has expired. You are already considered checked-in."
+      return
+    end
+
     if @resource_booking.update(checked_in_at: Time.current)
       render plain: "Thank you! Your check-in is confirmed."
     else
@@ -122,6 +127,11 @@ class ResourceBookingsController < ApplicationController
   # GET /resource_bookings/:id/quick_cancel
   # Simple action for one-click email cancellation.
   def quick_cancel
+    if Time.current > @resource_booking.start_time + 10.minutes
+      render plain: "This link has expired. Bookings can only be cancelled within 10 minutes of the start time via email."
+      return
+    end
+
     if @resource_booking.soft_delete
       render plain: "Your booking has been cancelled successfully."
     else
