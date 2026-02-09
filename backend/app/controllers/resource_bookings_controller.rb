@@ -141,15 +141,14 @@ class ResourceBookingsController < ApplicationController
 
   # GET /resource_bookings/availability
   def availability
-    # This action is authorize_resource'd via collection authorization in Ability.rb
+    # 1. Start with all active resources
     resources = OfficeResource.where(status: :active)
-    
-    # 1. Filter by specific type if requested (e.g., ?resource_type=room)
-    if params[:resource_type]
-      resources = resources.where(resource_type: params[:resource_type])
-    end
 
-    # 2. Filter by time window if requested (e.g., ?start_time=10:00&end_time=11:00)
+    # 2. Apply simple filters (only if they exist in the URL)
+    resources = resources.where(resource_type: params[:resource_type]) if params[:resource_type].present?
+    resources = resources.where(id: params[:office_resource_id]) if params[:office_resource_id].present?
+
+    # 3. Apply the time filter (using the helper method in the model)
     if params[:start_time].present? && params[:end_time].present?
       resources = resources.available_during(params[:start_time], params[:end_time])
     end

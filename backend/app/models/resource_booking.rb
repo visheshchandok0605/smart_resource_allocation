@@ -15,13 +15,15 @@ class ResourceBooking < ApplicationRecord
   validates :status, presence: true
 
   # Custom validations: These are methods (defined below) that check our specific business rules.
-  validate :within_office_hours
-  validate :not_on_weekend
-  validate :hourly_slots
-  # RULE: Prevent booking for times that have already passed.
-  validate :cannot_be_in_the_past
-  # RULE: Check for overlaps immediately, so users don't request busy slots.
-  validate :no_overlap
+  # RULE: These only apply when a booking is active or pending and NOT deleted.
+  # If we are rejecting, releasing, or deleting, we don't care about these rules anymore.
+  with_options if: -> { (pending? || approved? || modified?) && deleted_at.nil? } do
+    validate :within_office_hours
+    validate :not_on_weekend
+    validate :hourly_slots
+    validate :cannot_be_in_the_past
+    validate :no_overlap
+  end
 
   private
 
@@ -78,9 +80,10 @@ class ResourceBooking < ApplicationRecord
     # 3. Has already been 'approved' or 'modified'.
     overlapping = ResourceBooking
       .where(office_resource_id: office_resource_id)
+      .where(deleted_at: nil)
       #current booking is not overlapping
       .where.not(id: id)
-      .where(status: [:approved, :modified])
+      .where(status: [:approved, :modified, :pending])
       # This SQL checks if the requested range collides with any existing range.
       .where("(start_time, end_time) OVERLAPS (?, ?)", start_time, end_time)
 

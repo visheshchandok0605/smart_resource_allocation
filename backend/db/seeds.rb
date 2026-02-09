@@ -1,6 +1,16 @@
 # Seed specific resources from the requirements
-Admin = User.create!(name: "Admin User", email: "admin@office.com", password: "password", role: :admin)
-Employee = User.create!(name: "John Doe", email: "john@office.com", password: "password", role: :employee)
+Admin = User.find_or_create_by!(email: "vishesh.chandok@joshsoftware.com") do |u|
+  u.name = "Admin User"
+  u.password = "password"
+  u.role = :admin
+end
+
+Employee = User.find_or_create_by!(email: "john@office.com") do |u|
+  u.name = "John Doe"
+  u.password = "password"
+  u.role = :employee
+  u.employee_id = "EMP-001"
+end
 
 # Meeting Rooms
 OfficeResource.create!(name: "Meeting Room A", resource_type: :room, configuration: { capacity: 4 })

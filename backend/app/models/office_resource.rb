@@ -37,6 +37,7 @@ class OfficeResource < ApplicationRecord
   # This is a general check for what is available during a specific time.
   def self.available_during(start_time, end_time)
     where(status: :active).where.not(id: ResourceBooking.where(status: [:approved, :modified, :pending])
+                                    .where(deleted_at: nil)
                                     .where("(start_time, end_time) OVERLAPS (?, ?)", start_time, end_time)
                                     .select(:office_resource_id))
   end
