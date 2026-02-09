@@ -5,13 +5,19 @@ class ReportsController < ApplicationController
 
   # GET /reports/dashboard
   def dashboard
+    start_date = params[:start_date] ? Date.parse(params[:start_date]) : Date.current.beginning_of_month
+    end_date = params[:end_date] ? Date.parse(params[:end_date]) : Date.current.end_of_month
+
+    bookings_scope = ResourceBooking.where(start_time: start_date.beginning_of_day..end_date.end_of_day)
+
     utilization = OfficeResource.left_joins(:resource_bookings)
+                                .where(resource_bookings: { id: [nil, *bookings_scope.pluck(:id)] })
                                 .group(:id, :name)
                                 .select("office_resources.id, office_resources.name, count(resource_bookings.id) as bookings_count")
                                 .order("bookings_count DESC")
 
-    patterns = ResourceBooking.group("EXTRACT(HOUR FROM start_time)")
-                              .count
+    patterns = bookings_scope.group("EXTRACT(HOUR FROM start_time)")
+                             .count
 
     underutilized = utilization.select { |r| r.bookings_count.to_i == 0 }
     overutilized = utilization.first(3)

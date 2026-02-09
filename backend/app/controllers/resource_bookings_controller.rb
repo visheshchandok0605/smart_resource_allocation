@@ -143,9 +143,17 @@ class ResourceBookingsController < ApplicationController
   def availability
     # This action is authorize_resource'd via collection authorization in Ability.rb
     resources = OfficeResource.where(status: :active)
+    
+    # 1. Filter by specific type if requested (e.g., ?resource_type=room)
     if params[:resource_type]
       resources = resources.where(resource_type: params[:resource_type])
     end
+
+    # 2. Filter by time window if requested (e.g., ?start_time=10:00&end_time=11:00)
+    if params[:start_time].present? && params[:end_time].present?
+      resources = resources.available_during(params[:start_time], params[:end_time])
+    end
+
     render json: OfficeResourceBlueprint.render(resources)
   end
 

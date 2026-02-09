@@ -18,10 +18,20 @@ class ResourceBooking < ApplicationRecord
   validate :within_office_hours
   validate :not_on_weekend
   validate :hourly_slots
+  # RULE: Prevent booking for times that have already passed.
+  validate :cannot_be_in_the_past
   # RULE: Check for overlaps immediately, so users don't request busy slots.
   validate :no_overlap
 
   private
+
+  def cannot_be_in_the_past
+    return unless start_time
+    
+    if start_time < Time.current
+      errors.add(:start_time, "cannot be in the past")
+    end
+  end
 
   # RULE: Maintain hourly difference in time-slot (e.g., 9:00, 10:00, not 9:15).
   def hourly_slots
