@@ -15,6 +15,25 @@ class OfficeResource < ApplicationRecord
   # One resource can be booked many times (at different time slots).
   has_many :resource_bookings
 
+  # Handle cleanup when a resource is soft-deleted
+  after_update :cancel_upcoming_bookings, if: :saved_change_to_deleted_at?
+
+  private
+
+  def cancel_upcoming_bookings
+    return unless deleted_at.present?
+
+    # Find all upcoming bookings that are NOT already rejected or released
+    upcoming_bookings = resource_bookings.where("start_time > ?", Time.current)
+                                         .where.not(status: [:rejected, :released])
+
+    upcoming_bookings.each do |booking|
+      booking.update(status: :rejected, admin_note: "Resource '#{name}' has been discontinued or removed from service.")
+      # Optional: Send email notification
+      BookingMailer.booking_status_email(booking).deliver_now
+    end
+  end
+
   # This is a general check for what is available during a specific time.
   def self.available_during(start_time, end_time)
     where(status: :active).where.not(id: ResourceBooking.where(status: [:approved, :modified, :pending])
